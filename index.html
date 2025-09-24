@@ -1,0 +1,119 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hitesh Kumar - Resume</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Arial', sans-serif; background: linear-gradient(135deg, #1a2a6c, #2e5cb8); color: #333; line-height: 1.6; }
+        .container { max-width: 1000px; margin: 40px auto; padding: 40px; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.3); animation: fadeUp 1s ease-out; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .header { text-align: center; padding: 20px; background: rgba(0,0,0,0.05); border-radius: 15px; margin-bottom: 30px; }
+        .header img { width: 70px; vertical-align: middle; }
+        .header h1 { display: inline; margin-left: 15px; color: #ff4d4d; font-size: 2.8em; font-weight: 700; }
+        .contact { text-align: center; color: #555; margin-bottom: 40px; }
+        .contact a { color: #ff4d4d; text-decoration: none; font-weight: 600; transition: color 0.3s; }
+        .contact a:hover { color: #ff6b6b; }
+        .section { margin: 30px 0; padding: 25px; background: #fff; border-radius: 10px; border-left: 6px solid #ff4d4d; transition: transform 0.3s, box-shadow 0.3s; }
+        .section:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .section h2 { color: #2c3e50; font-size: 1.8em; margin-bottom: 15px; position: relative; }
+        .section h2::after { content: ''; position: absolute; width: 50px; height: 3px; background: #ff4d4d; bottom: -5px; left: 0; }
+        .section table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .section table, .section th, .section td { border: 1px solid #eee; padding: 12px; }
+        .section th { background: #2c3e50; color: white; }
+        .section .project { margin: 20px 0; padding: 15px; background: #f8f9fa; border-left: 4px solid #2c3e50; border-radius: 5px; }
+        .section .project h3 { color: #ff4d4d; margin-bottom: 10px; }
+        .section p { color: #666; }
+        @media (max-width: 768px) { .container { margin: 20px; padding: 20px; } .section { padding: 15px; } .header h1 { font-size: 2em; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://via.placeholder.com/70" alt="IITG Logo">
+            <h1>Hitesh Kumar</h1>
+        </div>
+        <div class="contact">
+            <p>Roll No.: 244161004 | +91-6378134332 | hkjeeaspirant@gmail.com | hiteshk1004@iitg.ac.in</p>
+            <p><a href="https://github.com/hiteshk1004">GitHub</a> | <a href="https://linkedin.com/in/hitesh-kumar-b83571285/">LinkedIn</a> | Website</p>
+            <p>Indian Institute of Technology, Guwahati</p>
+        </div>
+        <div class="section">
+            <h2>Education</h2>
+            <table>
+                <tr><th>Degree/Certificate</th><th>Institute/Board</th><th>CGPA / Percentage</th><th>Year</th></tr>
+                <tr><td>M.Tech</td><td>Indian Institute of Technology, Guwahati</td><td>6.7 (Current)</td><td>2024-Present</td></tr>
+                <tr><td>B.Tech</td><td>National Institute of Technology, Hamirpur</td><td>7.35 (Current)</td><td>2020-2024</td></tr>
+                <tr><td>Senior Secondary</td><td>RBSE Board</td><td>90.67%</td><td>2018</td></tr>
+            </table>
+        </div>
+        <div class="section">
+            <h2>Projects</h2>
+            <div class="project"><h3>Palm Print Recognition</h3><p>Sept 2025 - Nov 2025 | <a href="https://github.com/hiteshk1004">GitHub</a></p><p>Building a closed set palm print recognition based on fewly available public datasets. Feature extraction using various cnns and improving metrics by relevant data augmentation.</p></div>
+            <div class="project"><h3>Hindi Text Summarization</h3><p>Jan 2024 - May 2024 | <a href="https://github.com/hiteshk1004">GitHub</a></p><p>Built an abstractive text summarization model for Hindi, achieving ROUGE-1 and ROUGE-L scores of 0.67 (F-measure). Improved summary quality by optimizing for key content extraction; identified bigram capture as an area for further enhancement.</p></div>
+            <div class="project"><h3>Deepfake Video Detection</h3><p>July 2023 - Dec 2023 | <a href="https://github.com/hiteshk1004">GitHub</a></p><p>Developed a deep learning model to detect deepfake videos, achieving 90.89% accuracy. Innovated by incorporating full-video analysis, surpassing prior approaches focused solely on facial temporal movements. Tech Stack: Python, TensorFlow. Training Loss: 0.2981, Validation Loss: 0.3061, Training Recall: 0.9939, Validation Recall: 0.9606, Training Precision: 0.8394, Validation Precision: 0.8115.</p></div>
+        </div>
+        <div class="section">
+            <h2>Technical Skills</h2>
+            <p><strong>Programming Languages:</strong> Python, C/C++, SQL</p>
+            <p><strong>Frameworks & Tools:</strong> NumPy, Pandas, Matplotlib, TensorFlow, Flask</p>
+            <p><strong>Proficiency:</strong> Advanced: Python, TensorFlow | Intermediate: SQL, Flask | Basic: C/C++</p>
+        </div>
+        <div class="section">
+            <h2>Key Courses Taken</h2>
+            <p><strong>Mathematics:</strong> Linear Algebra, Calculus, Discrete Mathematics, Probability & Statistics</p>
+            <p><strong>Computer Science:</strong> DBMS, Computer Networks, Data Structures, Machine Learning, Deep Learning</p>
+            <p><strong>Proficiency:</strong> Advanced: Statistics, Machine Learning | Intermediate: Data Structures, Matrix Computations</p>
+        </div>
+        <div class="section">
+            <h2>Achievements</h2>
+            <p>Secured 98.38% Percentile (Rank 15,368) in JEE Mains – 2020</p>
+            <p>Achieved All India Rank 715 in GATE – 2024</p>
+        </div>
+        <div class="section">
+            <h2>Summary</h2>
+            <p>M.Tech Data Science student at IIT Guwahati with a strong foundation in machine learning and deep learning. Skilled in Python, TensorFlow, and SQL, with hands-on experience in deepfake detection and text summarization projects. Proven academic excellence with top ranks in JEE Mains and GATE, targeting innovative data-driven solutions.</p>
+        </div>
+    </div>
+</body>
+</html>
